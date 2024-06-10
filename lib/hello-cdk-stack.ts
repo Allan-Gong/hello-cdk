@@ -41,5 +41,39 @@ export class HelloCdkStack extends cdk.Stack {
         cdk.aws_cloudwatch.ComparisonOperator.GREATER_THAN_UPPER_THRESHOLD,
       thresholdMetricId: "ad1",
     });
+
+    const cfnAlarm1 = new cdk.aws_cloudwatch.CfnAlarm(this, "anomalyDetectionMathAlarm1", {
+      alarmName: "anomaly-detection-math-alarm1",
+      metrics: [
+        {
+          id: "ad1",
+          expression: "ANOMALY_DETECTION_BAND(me1, 2)",
+          returnData: true,
+        },
+        {
+          id: "me1",
+          expression: "IF(m1 > 10, m1, 0)",
+          returnData: true,
+        },
+        {
+          id: "m1",
+          metricStat: {
+            metric: {
+              metricName: metricStat?.metricName,
+              namespace: metricStat?.namespace,
+              dimensions: metricStat?.dimensions,
+            },
+            period: cdk.Duration.minutes(5).toSeconds(),
+            stat: cdk.aws_cloudwatch.Stats.SUM,
+          },
+          returnData: false,
+        },
+      ],
+      datapointsToAlarm: 5,
+      evaluationPeriods: 5,
+      comparisonOperator:
+        cdk.aws_cloudwatch.ComparisonOperator.GREATER_THAN_UPPER_THRESHOLD,
+      thresholdMetricId: "ad1",
+    });
   }
 }
